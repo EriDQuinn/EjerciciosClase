@@ -1,7 +1,7 @@
 /*---------------------------------------------------------*/
-/* ----------------   Pr醕tica 3 --------------------------*/
+/* ----------------   Pr谩ctica 3 --------------------------*/
 /*-----------------    2019-2   ---------------------------*/
-/*------------- Computaci髇 gr醘ica e interacci髇 humano computadora ---------------*/
+/*------------- Computaci贸n gr谩fica e interacci贸n humano computadora ---------------*/
 #include <glew.h>
 #include <glfw3.h>
 
@@ -134,7 +134,7 @@ void display(void)
 
 	glBindVertexArray(VAO);
 	glDrawArrays(GL_QUADS, 0, 24); //A lonely cube :(
-	model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));//traslaci髇 a la matriz del modelo
+	model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));//traslaci贸n a la matriz del modelo
 	projectionShader.setMat4("model", model);
 	glDrawArrays(GL_QUADS, 0, 24);
 	glBindVertexArray(0);
@@ -191,7 +191,7 @@ int main()
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		//Mi funci髇 de dibujo
+		//Mi funci贸n de dibujo
 		display();
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
