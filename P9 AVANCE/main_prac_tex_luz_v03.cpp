@@ -1,7 +1,12 @@
 /*---------------------------------------------------------*/
-/* ----------------   Pr·ctica 9 --------------------------*/
+/* ----------------   Pr√°ctica 9 --------------------------*/
 /*-----------------    2019-2   ---------------------------*/
-/*------------- Alumno: DIAZ ACOSTA ERIKA   ---------------*/
+/*------------- Alumno: DIAZ ACOSTA ERIKA   ---------------
+
+TECLA A : a la izquierda
+TECLA D : a la derecha
+TECLA W : acercar
+TECLA S : alejar */
 #define STB_IMAGE_IMPLEMENTATION
 #include "esfera.h"
 #include "camera.h"
@@ -26,12 +31,12 @@ GLuint VBO, VAO, EBO;
 //Camera
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 double	lastX = 0.0f,
-		lastY = 0.0f;
+lastY = 0.0f;
 bool firstMouse = true;
 
 //Timing
 double	deltaTime = 0.0f,
-		lastFrame = 0.0f;
+lastFrame = 0.0f;
 
 //Lighting  posicion direccion
 glm::vec3 lightPosition(0.0f, 3.0f, 0.0f);
@@ -46,19 +51,25 @@ unsigned int generateTextures(char*, bool);
 
 //For Keyboard
 float	movX = 0.0f,
-		movY = 0.0f,
-		movZ = -5.0f,
-		rotX = 0.0f;
+movY = 0.0f,
+movZ = -5.0f,
+rotX = 0.0f;
 
 //Texture
 unsigned int	t_smile,
-				t_toalla,
-				t_unam,
-				t_white,
-				t_panda,
-				t_cubo,
-				t_caja,
-				t_caja_brillo;
+t_toalla,
+t_unam,
+t_white,
+t_panda,
+t_cubo,
+t_caja,
+t_caja_brillo,
+t_marmol,
+t_x,
+t_metal,
+t_madera,
+//t_metal_brillo,
+t_circ;
 
 
 unsigned int generateTextures(const char* filename, bool alfa)
@@ -75,7 +86,7 @@ unsigned int generateTextures(const char* filename, bool alfa)
 	// load image, create texture and generate mipmaps
 	int width, height, nrChannels;
 	stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
-	
+
 	unsigned char *data = stbi_load(filename, &width, &height, &nrChannels, 0);
 	if (data)
 	{
@@ -117,8 +128,14 @@ void LoadTextures()
 	t_panda = generateTextures("Texturas/Panda_01.png", 1);
 	t_cubo = generateTextures("Texturas/Cube03.png", 1);
 	t_caja = generateTextures("Texturas/caja.png", 1);
-	t_marble = generateTextures("Texturas/TexturesCom_MarbleOther0109_1_S.png", 1);
-	t_caja_brillo = generateTextures("Texturas/caja_specular.jpg", 1);
+	t_marmol = generateTextures("Texturas/marmool.jpg", 0);
+	t_caja_brillo = generateTextures("Texturas/caja_specular.jpg", 0);
+	t_x = generateTextures("Texturas/XRay.jpg", 0);
+	t_metal = generateTextures("Texturas/metal.jpg", 0);
+	t_madera = generateTextures("Texturas/madera.jpg", 0);
+	t_circ = generateTextures("Texturas/circ.jpg", 0);
+
+
 	// bind textures on corresponding texture units
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -139,13 +156,22 @@ void LoadTextures()
 	glActiveTexture(GL_TEXTURE8);
 	glBindTexture(GL_TEXTURE_2D, t_caja_brillo);
 	glActiveTexture(GL_TEXTURE9);
-	glBindTexture(GL_TEXTURE_2D, t_marble);
+	glBindTexture(GL_TEXTURE_2D, t_marmol);
+	glBindTexture(GL_TEXTURE_2D, t_x);
+	glActiveTexture(GL_TEXTURE10);
+	glBindTexture(GL_TEXTURE_2D, t_metal);
+	glActiveTexture(GL_TEXTURE11);
+	glBindTexture(GL_TEXTURE_2D, t_madera);
+	glActiveTexture(GL_TEXTURE12);
+	glBindTexture(GL_TEXTURE_2D, t_circ);
+	glActiveTexture(GL_TEXTURE13);
+	
 
 
 }
 
 void myData()
-{	
+{
 	float vertices[] = {
 		// positions          // normals           // texture coords
 		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
@@ -211,36 +237,31 @@ void myData()
 		 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
 		-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
 
-		/*//Cara de atr·s
+		/*//Cara de atr√°s
 		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,		0.0f,  0.0f, -1.0f,//Bottom Left
 		0.5f, -0.5f, -0.5f,  1.0f, 0.0f,		0.0f,  0.0f, -1.0f,//Bottom Right
 		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,		0.0f,  0.0f, -1.0f,//Top Right
 		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,		0.0f,  0.0f, -1.0f,//Top Left
-
 		//Cara de enfrente
 		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,		0.0f,  0.0f, 1.0f,//Bottom Left
 		0.5f, -0.5f,  0.5f,  1.0f, 0.0f,		0.0f,  0.0f, 1.0f,//Bottom Right
 		0.5f,  0.5f,  0.5f,  1.0f, 1.0f,		0.0f,  0.0f, 1.0f,//Top Right
 		-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,		0.0f,  0.0f, 1.0f,//Top Left
-
 		//Cara de la izquierda
 		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,		-1.0f,  0.0f, 0.0f,//Bottom Left
 		-0.5f, -0.5f,  0.5f,  1.0f, 0.0f,		-1.0f,  0.0f, 0.0f,//Bottom Right
 		-0.5f,  0.5f,  0.5f,  1.0f, 1.0f,		-1.0f,  0.0f, 0.0f,//Top Right
 		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,		-1.0f,  0.0f, 0.0f,//Top Left
-
 		//Cara de la derecha
 		0.5f, -0.5f,  0.5f,  0.0f, 0.0f,		1.0f,  0.0f, 0.0f,//Bottom Left
 		0.5f, -0.5f, -0.5f,  1.0f, 0.0f,		1.0f,  0.0f, 0.0f,//Bottom Right
 		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,		1.0f,  0.0f, 0.0f,//Top Right
 		0.5f,  0.5f,  0.5f,  0.0f, 1.0f,		1.0f,  0.0f, 0.0f,//Top Left
-
 		//Cara de abajo
 		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,		0.0f,  -1.0f, 0.0f,//Bottom Left
 		0.5f, -0.5f, -0.5f,  1.0f,  0.0f,		0.0f,  -1.0f, 0.0f,//Bottom Right
 		0.5f, -0.5f,  0.5f,  1.0f,  1.0f,		0.0f,  -1.0f, 0.0f,//Top Right
 		-0.5f, -0.5f,  0.5f,  0.0f, 1.0f,		0.0f,  -1.0f, 0.0f,//Top Left
-
 		//Cara de arriba
 		-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,		0.0f,  1.0f, 0.0f,//Bottom Left
 		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,		0.0f,  1.0f, 0.0f,//Bottom Right
@@ -251,7 +272,7 @@ void myData()
 		0, 1, 3, // first triangle
 		1, 2, 3  // second triangle
 	};
-	
+
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);
@@ -285,9 +306,9 @@ void display(void)
 {//se pueden unir los shaders para usarlas todas
 	//Shader projectionShader("shaders/shader_light.vs", "shaders/shader_light.fs");
 	//Shader projectionShader("shaders/shader_texture_color.vs", "shaders/shader_texture_color.fs");
-	Shader lightingShader("shaders/shader_texture_light_pos.vs", "shaders/shader_texture_light_pos.fs"); //Positional
+	//Shader lightingShader("shaders/shader_texture_light_pos.vs", "shaders/shader_texture_light_pos.fs"); //Positional
 	//Shader lightingShader("shaders/shader_texture_light_dir.vs", "shaders/shader_texture_light_dir.fs"); //Directional
-	//Shader lightingShader("shaders/shader_texture_light_spot.vs", "shaders/shader_texture_light_spot.fs"); //Spotlight
+	Shader lightingShader("shaders/shader_texture_light_spot.vs", "shaders/shader_texture_light_spot.fs"); //Spotlight
 	Shader lampShader("shaders/shader_lamp.vs", "shaders/shader_lamp.fs");
 
 	//To Use Lighting
@@ -296,10 +317,10 @@ void display(void)
 	//If the light is Directional, we send the direction of the light
 	//lightingShader.setVec3("light.direction", lightDirection);	
 	//If the light is Positional, we send the position of the light
-	lightingShader.setVec3("light.position", lightPosition);
+	//lightingShader.setVec3("light.position", lightPosition);
 	//If the light is Spotlight, we put the light in the camera pasar posicion y direccion
-	//lightingShader.setVec3("light.position", camera.Position);
-	//lightingShader.setVec3("light.direction", camera.Front);
+	lightingShader.setVec3("light.position", camera.Position);
+	lightingShader.setVec3("light.direction", camera.Front);
 	lightingShader.setFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
 
 	lightingShader.setVec3("viewPos", camera.Position);
@@ -336,32 +357,25 @@ void display(void)
 
 
 	glBindVertexArray(VAO);
-	//Colocar cÛdigo aquÌ
+	//Colocar c√≥digo aqu√≠
 	lightingShader.setVec3("ambientColor", 0.0f, 0.0f, 0.0f);
 	lightingShader.setVec3("diffuseColor", 1.0f, 1.0f, 1.0f);
 	lightingShader.setVec3("specularColor", 1.0f, 0.0f, 0.0f);
-	lightingShader.setInt("material_diffuse", t_unam);
-	lightingShader.setInt("material_specular", t_caja_brillo);
-	glDrawArrays(GL_QUADS, 0, 24);
+	lightingShader.setInt("material_diffuse", t_madera);
+	lightingShader.setInt("material_speculrar", t_madera_brillo);
+	glDrawArrays(GL_QUADS,32, 8);
 
 	model = glm::translate(model, glm::vec3(4.0f, 0.0f, -1.0f));
 	model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
 	lightingShader.setMat4("model", model);
-	lightingShader.setInt("material_diffuse", t_caja);
-	glDrawArrays(GL_QUADS, 0, 24);
+	lightingShader.setInt("material_diffuse", t_marmol);
+	glDrawArrays(GL_QUADS, 24, 8);
 
-	model = glm::translate(glm::mat4(1.0f), glm::vec3(-2.0f, 0.0f, -3.0f));
-	model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
+	//model = glm::translate(glm::mat4(1.0f), glm::vec3(-2.0f, 0.0f, -3.0f));
+		//model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
 	lightingShader.setMat4("model", model);
-	lightingShader.setInt("material_diffuse", t_toalla);
-	glDrawArrays(GL_QUADS, 0, 24);
-
-
-	model = glm::translate(glm::mat4(1.0f), glm::vec3(-2.0f, 0.0f, -3.0f));
-	model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
-	lightingShader.setMat4("model", model);
-	lightingShader.setInt("material_diffuse", t_marble);
-	glDrawArrays(GL_QUADS, 0, 24);
+	lightingShader.setInt("material_diffuse", t_x);
+	glDrawArrays(GL_QUADS, 40, 8);
 
 
 	//Light
@@ -373,42 +387,47 @@ void display(void)
 	model = glm::scale(model, glm::vec3(0.25f));
 	lampShader.setMat4("model", model);
 
-	//glBindVertexArray(lightVAO);
-	glDrawArrays(GL_QUADS, 0, 24);	//Light
 
-	
+//	model = glm::translate(glm::mat4(1.0f), glm::vec3(-2.0f, 0.0f, -3.0f));
+	//model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
+	//lightingShader.setMat4("model", model);
+	//lightingShader.setInt("material_diffuse", t_metal);
+	//lightingShader.setInt("material_diffuse", t_metal_brillo);
+	glDrawArrays(GL_QUADS, 0,24);
+
+
 	glBindVertexArray(0);
 
 }
 
 int main()
 {
-    // glfw: initialize and configure
-    // ------------------------------
-    glfwInit();
-    /*glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);*/
+	// glfw: initialize and configure
+	// ------------------------------
+	glfwInit();
+	/*glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);*/
 
 #ifdef __APPLE__
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // uncomment this statement to fix compilation on OS X
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // uncomment this statement to fix compilation on OS X
 #endif
 
-    // glfw window creation
-    // --------------------
+	// glfw window creation
+	// --------------------
 	monitors = glfwGetPrimaryMonitor();
 	getResolution();
 
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Practica 9", NULL, NULL);
-    if (window == NULL)
-    {
-        std::cout << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-        return -1;
-    }
+	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Practica 9", NULL, NULL);
+	if (window == NULL)
+	{
+		std::cout << "Failed to create GLFW window" << std::endl;
+		glfwTerminate();
+		return -1;
+	}
 	glfwSetWindowPos(window, 0, 30);
-    glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, resize);
+	glfwMakeContextCurrent(window);
+	glfwSetFramebufferSizeCallback(window, resize);
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetScrollCallback(window, scroll_callback);
 
@@ -425,41 +444,41 @@ int main()
 	my_sphere.init();
 	glEnable(GL_DEPTH_TEST);
 
-    // render loop
-    // While the windows is not closed
-    while (!glfwWindowShouldClose(window))
-    {
+	// render loop
+	// While the windows is not closed
+	while (!glfwWindowShouldClose(window))
+	{
 		// per-frame time logic
 		// --------------------
 		double currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
-        // input
-        // -----
-        my_input(window);
+		// input
+		// -----
+		my_input(window);
 		animate();
 
-        // render
-        // Backgound color
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		// render
+		// Backgound color
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		//Mi funciÛn de dibujo
+		//Mi funci√≥n de dibujo
 		display();
 
-        // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-        // -------------------------------------------------------------------------------
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-    }
+		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
+		// -------------------------------------------------------------------------------
+		glfwSwapBuffers(window);
+		glfwPollEvents();
+	}
 
-    // glfw: terminate, clearing all previously allocated GLFW resources.
-    // ------------------------------------------------------------------
+	// glfw: terminate, clearing all previously allocated GLFW resources.
+	// ------------------------------------------------------------------
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
 
-    glfwTerminate();
-    return 0;
+	glfwTerminate();
+	return 0;
 }
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
@@ -477,7 +496,6 @@ void my_input(GLFWwindow *window)
 		camera.ProcessKeyboard(LEFT, (float)deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		camera.ProcessKeyboard(RIGHT, (float)deltaTime);
-	
 
 }
 
@@ -485,8 +503,8 @@ void my_input(GLFWwindow *window)
 // ---------------------------------------------------------------------------------------------
 void resize(GLFWwindow* window, int width, int height)
 {
-    // Set the Viewport to the size of the created window
-    glViewport(0, 0, width, height);
+	// Set the Viewport to the size of the created window
+	glViewport(0, 0, width, height);
 }
 
 // glfw: whenever the mouse moves, this callback is called
