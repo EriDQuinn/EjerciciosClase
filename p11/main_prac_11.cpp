@@ -1,7 +1,7 @@
 /*---------------------------------------------------------*/
-/* ----------------   Pr·ctica 11 --------------------------*/
+/* ----------------   Pr√°ctica 11 --------------------------*/
 /*-----------------    2019-2   ---------------------------*/
-/*------------- Alumno:                     ---------------*/
+/*------------- Alumno: Diaz Acosta Erika                    ---------------*/
 //#define STB_IMAGE_IMPLEMENTATION
 #include <glew.h>
 #include <glfw3.h>
@@ -70,7 +70,7 @@ float movKit_z = 0.0f,
 	rotKit_y=0.0f;
 
 int estado = 0;
-bool play;
+bool play, reversa;
 
 unsigned int generateTextures(const char* filename, bool alfa)
 {
@@ -225,67 +225,75 @@ void animate(void)
 {
 	if (play) {
 
-		if (estado == 0) {//ESTADO A
+		if (estado == 0) {
+			if (reversa){
 
-			if (movKit_z < 150) {//ESTADO A
-				movKit_z += 1.0f;
-				printf("%f \n", movKit_z);
+
 			}
-			else 
+			else
 			{
-				rotKit_y = 90;
-				estado = 1; //AL ESTADO B
+				if (movKit_z < 150) {
+								movKit_z += 1.0f;
+							}
+							else {
+								rotKit_y = 90;
+								estado = 1;
+							}
 			}
+			
 		}
 
-		if (estado == 1) {//ESTADO B
+		if (estado == 1) {
+			if (reversa) {
 
-			if (movKit_x < 180) {//ESTADO B
-				movKit_x += 1.0f;
-				printf("%f \n", movKit_x);
+
 			}
-			else {
-				rotKit_y = 180;
-				estado = 2; //AL ESTADO C
+			else
+			{
+				if (movKit_x < 180) {
+					movKit_x += 1.0f;
+					printf("%f \n", movKit_x);
+				}
+				else {
+					rotKit_y = 180;
+					estado = 2;
+				}
 			}
 		}
-		if (estado == 2) {//ESTADO C
+		if (estado == 2) {
+			if (reversa) {
 
-			if (movKit_x > 180) {
-				movKit_x += -1.0f;
-				printf("%f \n", movKit_x);
+
 			}
-			else {
-				rotKit_y = 180;
-				estado = 3;//AL ESTADO D
+			else
+			{
+				if (movKit_z > -150) {
+					movKit_z += -1.0f;
+					printf("%f \n", movKit_z);
+				}
+				else {
+					rotKit_y = 270;
+					estado = 3;
+				}
 			}
 		}
-		if (estado == 3) {//ESTADO D
+		if (estado == 3) {
+			if (reversa) {
 
-			if (movKit_z > -150) {
-				movKit_z += -1.0f;
-				printf("%f \n", movKit_z);
-			}
-			else {
-				rotKit_y = 270;
-				estado = 4;//AL ESTADO A
-			}
-		}
-	
-		if (estado == 4) {//ESTADO D
 
-			if (movKit_z  >0) {
-				movKit_x +=- 1.0f;
-				printf("%f \n", movKit_x);
 			}
-			else {
-				rotKit_y = 90;
-				estado = 0;//AL ESTADO A
+			else
+			{
+				if (movKit_x > 0) {
+					movKit_x += -1.0f;
+					printf("%f \n", movKit_x);
+				}
+				else {
+					rotKit_y = 0;
+					estado = 0;
+				}
 			}
 		}
-	
-
-
 	}
 	
 
@@ -435,7 +443,8 @@ void my_input(GLFWwindow *window)
 		play = true;
 	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
 		play = false;
-
+	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+		reversa = true;
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
