@@ -1,16 +1,17 @@
 /*---------------------------------------------------------*/
-/* ----------------   Pr·ctica 11 --------------------------*/
+/* ----------------   Pr√°ctica 11 --------------------------*/
 /*-----------------    2019-2   ---------------------------*/
 /*------------- Alumno: Diaz Acosta Erika  ---------------*/
+/*------------------Grupo4--------------------------------*/
+/*--------------Version 2019 Visual Studio-----------------*/
 //Tecla espacio para empezar a avanzar
-//Tecla   para detenerse
-//Tecla   para iniciar reversa
+//Tecla R  para iniciar reversa
 //Tecla P para detener avance
-//Tecla
+//Tecla O detiene la reversa
 //Tecla S alejar
 //Tecla W acercar 
 //Teclas A y D para moder la camara hacia los lados
-
+//MOUSE Y SCROLL PARA MOVER CAMARA
 
 //#define STB_IMAGE_IMPLEMENTATION
 #include <glew.h>
